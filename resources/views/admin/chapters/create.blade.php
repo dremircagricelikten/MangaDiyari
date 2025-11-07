@@ -8,7 +8,7 @@
 
     <div class="card">
         <div class="card-body">
-            <form action="{{ route('admin.chapters.store') }}" method="POST">
+            <form action="{{ route('admin.chapters.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @include('admin.chapters.form', ['mangas' => $mangas])
             </form>

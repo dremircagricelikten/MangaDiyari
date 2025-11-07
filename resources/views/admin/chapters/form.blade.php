@@ -36,6 +36,17 @@
         @enderror
     </div>
     <div class="col-12">
+        <label for="page_files" class="form-label">Sayfa Dosyaları (isteğe bağlı)</label>
+        <input type="file" name="page_files[]" id="page_files" class="form-control @error('page_files.*') is-invalid @enderror" multiple accept="image/*">
+        <div class="form-text">Birden fazla görsel seçebilirsiniz. Dosya yüklemesi yapılırsa mevcut sayfa listesi otomatik olarak güncellenir.</div>
+        @error('page_files')
+            <div class="invalid-feedback d-block">{{ $message }}</div>
+        @enderror
+        @error('page_files.*')
+            <div class="invalid-feedback d-block">{{ $message }}</div>
+        @enderror
+    </div>
+    <div class="col-12">
         <label class="form-label">Sayfa URL'leri</label>
         <div id="pages-wrapper">
             @foreach ($pageUrls as $index => $url)

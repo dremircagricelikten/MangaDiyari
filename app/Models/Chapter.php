@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Facades\Storage;
 
 class Chapter extends Model
 {
@@ -31,6 +32,16 @@ class Chapter extends Model
     protected $casts = [
         'pages' => 'array',
     ];
+
+    protected static function booted(): void
+    {
+        static::deleting(function (Chapter $chapter) {
+            $disk = config('media.disk', config('filesystems.default'));
+            $directory = 'chapters/'.(string) $chapter->id;
+
+            Storage::disk($disk)->deleteDirectory($directory);
+        });
+    }
 
     /**
      * Get the manga that owns the chapter.

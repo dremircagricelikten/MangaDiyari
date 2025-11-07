@@ -3,7 +3,10 @@
 @section('content')
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3">Bölümler</h1>
-        <a href="{{ route('admin.chapters.create') }}" class="btn btn-primary">Yeni Bölüm</a>
+        <div class="btn-group" role="group" aria-label="Bölüm işlemleri">
+            <a href="{{ route('admin.chapters.create') }}" class="btn btn-primary">Yeni Bölüm</a>
+            <a href="{{ route('admin.chapters.upload') }}" class="btn btn-outline-primary">Çoklu Yükleme</a>
+        </div>
     </div>
 
     @if (session('status'))
