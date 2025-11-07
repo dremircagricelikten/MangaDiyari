@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\OptimizeMangaCoverImage;
 use App\Models\Manga;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -46,8 +47,14 @@ class MangaController extends Controller
             'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
+        $disk = config('media.disk', config('filesystems.default'));
+
         if ($request->hasFile('cover_image')) {
-            $validated['cover_image_path'] = $request->file('cover_image')->store('covers', 'public');
+            $validated['cover_image_path'] = $request->file('cover_image')->store('covers', $disk);
+
+            if (config('media.optimize')) {
+                OptimizeMangaCoverImage::dispatch($validated['cover_image_path'], $disk)->onQueue('media');
+            }
         }
 
         unset($validated['cover_image']);
@@ -87,12 +94,18 @@ class MangaController extends Controller
             'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
+        $disk = config('media.disk', config('filesystems.default'));
+
         if ($request->hasFile('cover_image')) {
             if ($manga->cover_image_path) {
-                Storage::disk('public')->delete($manga->cover_image_path);
+                Storage::disk($disk)->delete($manga->cover_image_path);
             }
 
-            $validated['cover_image_path'] = $request->file('cover_image')->store('covers', 'public');
+            $validated['cover_image_path'] = $request->file('cover_image')->store('covers', $disk);
+
+            if (config('media.optimize')) {
+                OptimizeMangaCoverImage::dispatch($validated['cover_image_path'], $disk)->onQueue('media');
+            }
         }
 
         unset($validated['cover_image']);
@@ -112,8 +125,10 @@ class MangaController extends Controller
      */
     public function destroy(Manga $manga): RedirectResponse
     {
+        $disk = config('media.disk', config('filesystems.default'));
+
         if ($manga->cover_image_path) {
-            Storage::disk('public')->delete($manga->cover_image_path);
+            Storage::disk($disk)->delete($manga->cover_image_path);
         }
 
         $manga->delete();

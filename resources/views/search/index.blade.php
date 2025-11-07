@@ -50,8 +50,9 @@
         @forelse ($results as $manga)
             <div class="col-12 col-sm-6 col-lg-4">
                 <div class="card h-100 shadow-sm">
-                    @if ($manga->cover_image_path)
-                        <img src="{{ Storage::url($manga->cover_image_path) }}" class="card-img-top" alt="{{ $manga->title }}">
+                    @php($coverUrl = \App\Support\MediaUrlGenerator::fromPath($manga->cover_image_path))
+                    @if ($coverUrl)
+                        <img src="{{ $coverUrl }}" class="card-img-top" alt="{{ $manga->title }}">
                     @endif
                     <div class="card-body d-flex flex-column">
                         <h2 class="h5">

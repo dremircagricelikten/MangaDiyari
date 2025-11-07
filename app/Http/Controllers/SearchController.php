@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Manga;
+use App\Support\Cache\MangaCache;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
@@ -43,21 +44,25 @@ class SearchController extends Controller
             ->paginate(12)
             ->withQueryString();
 
-        $availableStatuses = Manga::query()
-            ->select('status')
-            ->whereNotNull('status')
-            ->distinct()
-            ->orderBy('status')
-            ->pluck('status');
+        $availableStatuses = MangaCache::rememberSearchStatuses(function () {
+            return Manga::query()
+                ->select('status')
+                ->whereNotNull('status')
+                ->distinct()
+                ->orderBy('status')
+                ->pluck('status');
+        });
 
-        $availableGenres = Manga::query()
-            ->select('genres')
-            ->whereNotNull('genres')
-            ->get()
-            ->flatMap(fn ($manga) => $manga->genres ?? [])
-            ->unique()
-            ->sort()
-            ->values();
+        $availableGenres = MangaCache::rememberSearchGenres(function () {
+            return Manga::query()
+                ->select('genres')
+                ->whereNotNull('genres')
+                ->get()
+                ->flatMap(fn ($manga) => $manga->genres ?? [])
+                ->unique()
+                ->sort()
+                ->values();
+        });
 
         return view('search.index', [
             'results' => $results,

@@ -75,10 +75,13 @@
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
         @if ($isEdit && $manga->cover_image_path)
-            <div class="mt-2">
-                <img src="{{ Storage::url($manga->cover_image_path) }}" alt="{{ $manga->title }}" class="img-thumbnail"
-                    style="max-height: 150px;">
-            </div>
+            @php($coverUrl = \App\Support\MediaUrlGenerator::fromPath($manga->cover_image_path))
+            @if ($coverUrl)
+                <div class="mt-2">
+                    <img src="{{ $coverUrl }}" alt="{{ $manga->title }}" class="img-thumbnail"
+                        style="max-height: 150px;">
+                </div>
+            @endif
         @endif
     </div>
 </div>
