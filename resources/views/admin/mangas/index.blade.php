@@ -28,8 +28,9 @@
                         @forelse ($mangas as $manga)
                             <tr>
                                 <td style="width: 80px;">
-                                    @if ($manga->cover_image_path)
-                                        <img src="{{ Storage::url($manga->cover_image_path) }}" alt="{{ $manga->title }}" class="img-fluid rounded" />
+                                    @php($coverUrl = \App\Support\MediaUrlGenerator::fromPath($manga->cover_image_path))
+                                    @if ($coverUrl)
+                                        <img src="{{ $coverUrl }}" alt="{{ $manga->title }}" class="img-fluid rounded" />
                                     @else
                                         <span class="text-muted">-</span>
                                     @endif

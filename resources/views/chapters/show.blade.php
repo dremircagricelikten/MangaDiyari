@@ -28,9 +28,12 @@
             @if (is_array($chapter->pages) && count($chapter->pages))
                 <div class="d-flex flex-column gap-4">
                     @foreach ($chapter->pages as $index => $page)
+                        @php($pageUrl = \App\Support\MediaUrlGenerator::fromPath($page))
                         <figure class="mb-0">
-                            <img src="{{ $page }}" alt="{{ $manga->title }} - Bölüm {{ $chapter->number }} Sayfa {{ $index + 1 }}"
-                                class="img-fluid rounded shadow-sm">
+                            @if ($pageUrl)
+                                <img src="{{ $pageUrl }}" alt="{{ $manga->title }} - Bölüm {{ $chapter->number }} Sayfa {{ $index + 1 }}"
+                                    class="img-fluid rounded shadow-sm">
+                            @endif
                             <figcaption class="text-muted small mt-2">Sayfa {{ $index + 1 }}</figcaption>
                         </figure>
                     @endforeach

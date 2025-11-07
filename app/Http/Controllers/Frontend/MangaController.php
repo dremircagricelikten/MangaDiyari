@@ -4,15 +4,18 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Manga;
+use App\Support\Cache\MangaCache;
 use Illuminate\Contracts\View\View;
 
 class MangaController extends Controller
 {
     public function show(Manga $manga): View
     {
-        $manga->load(['chapters' => function ($query) {
-            $query->orderByDesc('number');
-        }]);
+        $chapters = MangaCache::rememberChapters($manga->getKey(), function () use ($manga) {
+            return $manga->chapters()->orderByDesc('number')->get();
+        });
+
+        $manga->setRelation('chapters', $chapters);
 
         return view('mangas.show', [
             'manga' => $manga,
