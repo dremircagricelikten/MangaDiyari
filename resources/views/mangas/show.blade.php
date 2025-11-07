@@ -34,6 +34,69 @@
                         <dt class="col-4">Bölüm</dt>
                         <dd class="col-8">{{ $manga->chapters->count() }}</dd>
                     </dl>
+                    @auth
+                        <div class="d-grid gap-2 mt-4">
+                            @if ($isFavorite)
+                                <form action="{{ route('favorites.destroy', $manga) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-outline-danger w-100">Favorilerden Çıkar</button>
+                                </form>
+                            @else
+                                <form action="{{ route('favorites.store', $manga) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-primary w-100">Favorilere Ekle</button>
+                                </form>
+                            @endif
+
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h2 class="h6 mb-3">Okuma Listesi</h2>
+                                    @if ($readingListEntry)
+                                        <p class="small text-muted mb-3">Son okunan bölüm: <strong>{{ $readingListEntry->pivot->last_read_chapter_number }}</strong></p>
+                                        <form action="{{ route('reading-list.update', $manga) }}" method="POST" class="row g-2 align-items-center">
+                                            @csrf
+                                            @method('PATCH')
+                                            <div class="col-7">
+                                                <label class="visually-hidden" for="last_read_chapter_number">Son Bölüm</label>
+                                                <input type="number" min="0" class="form-control @error('last_read_chapter_number') is-invalid @enderror"
+                                                    id="last_read_chapter_number" name="last_read_chapter_number"
+                                                    value="{{ old('last_read_chapter_number', $readingListEntry->pivot->last_read_chapter_number) }}">
+                                                @error('last_read_chapter_number')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                            <div class="col-5 d-grid">
+                                                <button type="submit" class="btn btn-outline-primary">İlerlemeni Güncelle</button>
+                                            </div>
+                                        </form>
+                                        <form action="{{ route('reading-list.destroy', $manga) }}" method="POST" class="mt-3">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-link text-danger p-0">Okuma listesinden kaldır</button>
+                                        </form>
+                                    @else
+                                        <form action="{{ route('reading-list.store', $manga) }}" method="POST" class="row g-2 align-items-center">
+                                            @csrf
+                                            <div class="col-7">
+                                                <label class="visually-hidden" for="last_read_chapter_number">Son Bölüm</label>
+                                                <input type="number" min="0" class="form-control @error('last_read_chapter_number') is-invalid @enderror"
+                                                    id="last_read_chapter_number" name="last_read_chapter_number"
+                                                    value="{{ old('last_read_chapter_number', 0) }}"
+                                                    placeholder="Son okunan bölüm">
+                                                @error('last_read_chapter_number')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                            <div class="col-5 d-grid">
+                                                <button type="submit" class="btn btn-outline-primary">Okuma Listesine Ekle</button>
+                                            </div>
+                                        </form>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endauth
                 </div>
             </div>
             @if ($manga->genres)
