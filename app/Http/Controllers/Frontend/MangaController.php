@@ -11,9 +11,22 @@ class MangaController extends Controller
 {
     public function show(Manga $manga): View
     {
-        $manga->load(['chapters' => function ($query) {
-            $query->orderByDesc('number');
-        }]);
+        $manga->load([
+            'chapters' => function ($query) {
+                $query->orderByDesc('number');
+            },
+            'comments' => function ($query) {
+                $query->latest()->with('user');
+            },
+        ]);
+
+        $isSubscribed = false;
+
+        if (Auth::check()) {
+            $isSubscribed = $manga->subscribers()
+                ->where('users.id', Auth::id())
+                ->exists();
+        }
 
         $user = Auth::user();
 
@@ -27,8 +40,7 @@ class MangaController extends Controller
 
         return view('mangas.show', [
             'manga' => $manga,
-            'isFavorite' => $isFavorite,
-            'readingListEntry' => $readingListEntry,
+            'isSubscribed' => $isSubscribed,
         ]);
     }
 }

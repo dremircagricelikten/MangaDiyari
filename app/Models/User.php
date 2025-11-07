@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -16,6 +17,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_admin',
     ];
 
     protected $hidden = [
@@ -26,23 +28,22 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'is_admin' => 'boolean',
     ];
 
     /**
-     * Mangas that the user has marked as favorite.
+     * Get the comments written by the user.
      */
-    public function favorites(): BelongsToMany
+    public function comments(): HasMany
     {
-        return $this->belongsToMany(Manga::class, 'favorites')->withTimestamps();
+        return $this->hasMany(Comment::class);
     }
 
     /**
-     * Mangas that belong to the user's reading list.
+     * Get the mangas the user subscribed to.
      */
-    public function readingList(): BelongsToMany
+    public function subscribedMangas(): BelongsToMany
     {
-        return $this->belongsToMany(Manga::class, 'reading_list')
-            ->withPivot(['last_read_chapter_number', 'last_read_at'])
-            ->withTimestamps();
+        return $this->belongsToMany(Manga::class, 'manga_subscriptions')->withTimestamps();
     }
 }
