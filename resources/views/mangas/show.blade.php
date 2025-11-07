@@ -34,6 +34,24 @@
                         <dt class="col-4">Bölüm</dt>
                         <dd class="col-8">{{ $manga->chapters->count() }}</dd>
                     </dl>
+                    @auth
+                        <form method="POST"
+                            action="{{ $isSubscribed ? route('mangas.unsubscribe', $manga) : route('mangas.subscribe', $manga) }}"
+                            class="mt-3">
+                            @csrf
+                            @if ($isSubscribed)
+                                @method('DELETE')
+                            @endif
+                            <button type="submit"
+                                class="btn {{ $isSubscribed ? 'btn-outline-danger' : 'btn-dark' }} w-100">
+                                {{ $isSubscribed ? 'Aboneliği Sonlandır' : 'Yeni Bölümleri Maille Al' }}
+                            </button>
+                        </form>
+                    @else
+                        <p class="text-muted small mt-3">
+                            Yeni bölümler yayınlandığında bildirim almak için <a href="{{ route('login') }}">giriş yapın</a>.
+                        </p>
+                    @endauth
                 </div>
             </div>
             @if ($manga->genres)
@@ -76,6 +94,12 @@
                     @endforelse
                 </div>
             </div>
+
+            @include('partials.comments', [
+                'comments' => $manga->comments,
+                'storeRoute' => route('manga-comments.store', $manga),
+                'formId' => 'manga-comment-body',
+            ])
         </div>
     </div>
 @endsection

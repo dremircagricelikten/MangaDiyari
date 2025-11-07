@@ -12,6 +12,9 @@ class ChapterController extends Controller
     {
         $chapter = $manga->chapters()
             ->where('number', $number)
+            ->with(['comments' => function ($query) {
+                $query->latest()->with('user');
+            }])
             ->firstOrFail();
 
         $previousChapter = $manga->chapters()

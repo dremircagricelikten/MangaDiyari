@@ -8,7 +8,9 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MangaSubscriptionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
@@ -31,6 +33,15 @@ Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
 Route::middleware('auth')->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 });
+
+Route::middleware('auth')
+    ->group(function () {
+        Route::post('/mangas/{manga}/comments', [CommentController::class, 'storeForManga'])->name('manga-comments.store');
+        Route::post('/mangas/{manga}/chapters/{number}/comments', [CommentController::class, 'storeForChapter'])->name('chapter-comments.store');
+        Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+        Route::post('/mangas/{manga}/subscribe', [MangaSubscriptionController::class, 'store'])->name('mangas.subscribe');
+        Route::delete('/mangas/{manga}/subscribe', [MangaSubscriptionController::class, 'destroy'])->name('mangas.unsubscribe');
+    });
 
 Route::middleware('auth')
     ->prefix('admin')
