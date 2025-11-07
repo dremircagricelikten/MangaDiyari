@@ -24,6 +24,16 @@
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
     </div>
+    <div class="col-12">
+        <label for="genres" class="form-label">Türler</label>
+        <input type="text" class="form-control @error('genres') is-invalid @enderror" id="genres" name="genres"
+            value="{{ old('genres', isset($manga) ? implode(', ', $manga->genres ?? []) : '') }}"
+            placeholder="Örn: Aksiyon, Fantastik, Romantizm">
+        <div class="form-text">Türleri virgül ile ayırarak girin.</div>
+        @error('genres')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
     <div class="col-md-4">
         <label for="status" class="form-label">Durum</label>
         <input type="text" class="form-control @error('status') is-invalid @enderror" id="status" name="status"

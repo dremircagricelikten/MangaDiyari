@@ -1,13 +1,82 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="text-center py-5">
-    <h1 class="display-4 fw-bold">Welcome to {{ config('app.name', 'MangaDiyari') }}</h1>
-    <p class="lead text-muted">Discover and share your favourite manga adventures.</p>
-    @guest
-        <a href="{{ route('register') }}" class="btn btn-dark btn-lg mt-3">Join Now</a>
-    @else
-        <a href="{{ route('dashboard') }}" class="btn btn-outline-dark btn-lg mt-3">Go to Dashboard</a>
-    @endguest
+<div class="py-5 text-center">
+    <h1 class="display-4 fw-bold mb-3">{{ config('app.name', 'MangaDiyari') }}'ye Hoş Geldin</h1>
+    <p class="lead text-muted">En sevdiğin mangaları keşfet, oku ve toplulukla paylaş.</p>
+    <div class="d-flex flex-column flex-sm-row justify-content-center gap-2 mt-4">
+        <a href="{{ route('search') }}" class="btn btn-dark btn-lg">Manga Keşfet</a>
+        @guest
+            <a href="{{ route('register') }}" class="btn btn-outline-dark btn-lg">Hemen Katıl</a>
+        @else
+            <a href="{{ route('dashboard') }}" class="btn btn-outline-dark btn-lg">Panelime Git</a>
+        @endguest
+    </div>
 </div>
+
+<section class="py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3 mb-0">Popüler Mangalar</h2>
+        <a href="{{ route('search', ['sort' => 'popular']) }}" class="btn btn-sm btn-outline-dark">Tümünü Gör</a>
+    </div>
+    <div class="row g-4">
+        @forelse ($popularMangas as $manga)
+            <div class="col-12 col-sm-6 col-lg-4">
+                <div class="card h-100 shadow-sm">
+                    @if ($manga->cover_image_path)
+                        <img src="{{ Storage::url($manga->cover_image_path) }}" class="card-img-top" alt="{{ $manga->title }}">
+                    @endif
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <h3 class="h5 mb-0">
+                                <a href="{{ route('mangas.show', $manga) }}" class="text-decoration-none text-dark">
+                                    {{ $manga->title }}
+                                </a>
+                            </h3>
+                            <span class="badge bg-dark">{{ $manga->chapters_count }} bölüm</span>
+                        </div>
+                        <p class="text-muted small flex-grow-1">{{ \Illuminate\Support\Str::limit($manga->summary, 110) }}</p>
+                        <div class="mt-3 d-flex flex-wrap gap-2">
+                            @foreach (($manga->genres ?? []) as $genre)
+                                <span class="badge rounded-pill text-bg-secondary">{{ $genre }}</span>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <p class="text-muted">Henüz popüler manga bulunmuyor.</p>
+        @endforelse
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3 mb-0">Yeni Eklenenler</h2>
+        <a href="{{ route('search') }}" class="btn btn-sm btn-outline-dark">Yeni Mangaları Ara</a>
+    </div>
+    <div class="row g-4">
+        @forelse ($latestMangas as $manga)
+            <div class="col-12 col-sm-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    @if ($manga->cover_image_path)
+                        <img src="{{ Storage::url($manga->cover_image_path) }}" class="card-img-top" alt="{{ $manga->title }}">
+                    @endif
+                    <div class="card-body d-flex flex-column">
+                        <h3 class="h5">
+                            <a href="{{ route('mangas.show', $manga) }}" class="text-decoration-none text-dark">{{ $manga->title }}</a>
+                        </h3>
+                        <p class="text-muted small flex-grow-1">{{ \Illuminate\Support\Str::limit($manga->summary, 100) }}</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="badge text-bg-light text-dark border">{{ $manga->status }}</span>
+                            <small class="text-muted">{{ optional($manga->created_at)->diffForHumans() }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <p class="text-muted">Henüz manga eklenmemiş.</p>
+        @endforelse
+    </div>
+</section>
 @endsection

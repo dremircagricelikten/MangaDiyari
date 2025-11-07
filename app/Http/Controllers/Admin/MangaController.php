@@ -38,6 +38,7 @@ class MangaController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255', 'unique:mangas,slug'],
             'summary' => ['nullable', 'string'],
+            'genres' => ['nullable', 'string'],
             'status' => ['required', 'string', 'max:50'],
             'author' => ['nullable', 'string', 'max:255'],
             'artist' => ['nullable', 'string', 'max:255'],
@@ -50,6 +51,10 @@ class MangaController extends Controller
         }
 
         unset($validated['cover_image']);
+
+        if (array_key_exists('genres', $validated)) {
+            $validated['genres'] = $this->prepareGenres($validated['genres']);
+        }
 
         Manga::create($validated);
 
@@ -74,6 +79,7 @@ class MangaController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255', 'unique:mangas,slug,' . $manga->id],
             'summary' => ['nullable', 'string'],
+            'genres' => ['nullable', 'string'],
             'status' => ['required', 'string', 'max:50'],
             'author' => ['nullable', 'string', 'max:255'],
             'artist' => ['nullable', 'string', 'max:255'],
@@ -90,6 +96,10 @@ class MangaController extends Controller
         }
 
         unset($validated['cover_image']);
+
+        if (array_key_exists('genres', $validated)) {
+            $validated['genres'] = $this->prepareGenres($validated['genres']);
+        }
 
         $manga->update($validated);
 
@@ -110,5 +120,21 @@ class MangaController extends Controller
 
         return redirect()->route('admin.mangas.index')
             ->with('status', 'Manga başarıyla silindi.');
+    }
+    /**
+     * @return array<int, string>
+     */
+    private function prepareGenres(?string $genres): array
+    {
+        if (blank($genres)) {
+            return [];
+        }
+
+        return collect(explode(',', $genres))
+            ->map(fn (string $genre) => trim($genre))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
     }
 }

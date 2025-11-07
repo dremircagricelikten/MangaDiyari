@@ -19,6 +19,7 @@ class Manga extends Model
         'title',
         'slug',
         'summary',
+        'genres',
         'cover_image_path',
         'status',
         'author',
@@ -33,6 +34,7 @@ class Manga extends Model
      */
     protected $casts = [
         'published_at' => 'date',
+        'genres' => 'array',
     ];
 
     /**
@@ -41,5 +43,10 @@ class Manga extends Model
     public function chapters(): HasMany
     {
         return $this->hasMany(Chapter::class);
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
     }
 }
