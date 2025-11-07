@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\ChapterController;
+use App\Http\Controllers\Admin\MangaController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DashboardController;
@@ -22,3 +24,11 @@ Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
 Route::middleware('auth')->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 });
+
+Route::middleware('auth')
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::resource('mangas', MangaController::class)->except('show');
+        Route::resource('chapters', ChapterController::class)->except('show');
+    });
