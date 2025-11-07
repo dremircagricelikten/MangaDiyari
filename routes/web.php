@@ -55,6 +55,8 @@ Route::middleware('auth')
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
+        Route::get('chapters/upload', [ChapterController::class, 'uploadForm'])->name('chapters.upload');
+        Route::post('chapters/upload', [ChapterController::class, 'bulkStore'])->name('chapters.upload.store');
         Route::resource('mangas', MangaController::class)->except('show');
         Route::resource('chapters', ChapterController::class)->except('show');
     });
