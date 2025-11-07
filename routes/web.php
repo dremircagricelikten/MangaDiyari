@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ChapterController;
 use App\Http\Controllers\Admin\MangaController;
 use App\Http\Controllers\Frontend\ChapterController as FrontChapterController;
+use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\Frontend\MangaController as FrontMangaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SearchController;
@@ -32,6 +33,13 @@ Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
 
 Route::middleware('auth')->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
+
+    Route::post('mangas/{manga}/favorite', [FavoriteController::class, 'store'])->name('favorites.store');
+    Route::delete('mangas/{manga}/favorite', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
+
+    Route::post('mangas/{manga}/reading-list', [ReadingListController::class, 'store'])->name('reading-list.store');
+    Route::patch('mangas/{manga}/reading-list', [ReadingListController::class, 'update'])->name('reading-list.update');
+    Route::delete('mangas/{manga}/reading-list', [ReadingListController::class, 'destroy'])->name('reading-list.destroy');
 });
 
 Route::middleware('auth')

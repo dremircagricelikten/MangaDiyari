@@ -28,6 +28,16 @@ class MangaController extends Controller
                 ->exists();
         }
 
+        $user = Auth::user();
+
+        $isFavorite = false;
+        $readingListEntry = null;
+
+        if ($user) {
+            $isFavorite = $user->favorites()->where('manga_id', $manga->id)->exists();
+            $readingListEntry = $user->readingList()->where('manga_id', $manga->id)->first();
+        }
+
         return view('mangas.show', [
             'manga' => $manga,
             'isSubscribed' => $isSubscribed,
