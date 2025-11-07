@@ -16,7 +16,12 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
+            <form class="d-flex ms-lg-auto my-3 my-lg-0" role="search" action="{{ route('search') }}" method="GET">
+                <input class="form-control me-2" type="search" name="q" placeholder="Manga ara"
+                    value="{{ request('q') }}" aria-label="Search">
+                <button class="btn btn-outline-light" type="submit">Ara</button>
+            </form>
+            <ul class="navbar-nav ms-lg-3 ms-auto">
                 @auth
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a>
