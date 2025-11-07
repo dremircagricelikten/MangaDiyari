@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  tests:
+    name: Run test suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, sqlite3, dom, fileinfo
+          tools: composer
+          coverage: none
+
+      - name: Copy environment file
+        run: cp .env.testing .env
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Generate application key
+        run: php artisan key:generate
+
+      - name: Run PHPUnit tests
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ':memory:'
+        run: php artisan test --testsuite=Feature
+
+  deploy:
+    name: Deploy application
+    needs: tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Trigger Laravel Forge deployment
+        if: ${{ secrets.FORGE_API_TOKEN != '' && secrets.FORGE_SERVER_ID != '' && secrets.FORGE_SITE_ID != '' }}
+        env:
+          FORGE_API_TOKEN: ${{ secrets.FORGE_API_TOKEN }}
+          FORGE_SERVER_ID: ${{ secrets.FORGE_SERVER_ID }}
+          FORGE_SITE_ID: ${{ secrets.FORGE_SITE_ID }}
+        run: |
+          curl -s -X POST \
+            -H "Authorization: Bearer ${FORGE_API_TOKEN}" \
+            -H "Accept: application/json" \
+            https://forge.laravel.com/api/v1/servers/${FORGE_SERVER_ID}/sites/${FORGE_SITE_ID}/deploy
+
+      - name: Deploy to Laravel Vapor
+        if: ${{ secrets.VAPOR_API_TOKEN != '' && secrets.VAPOR_TEAM != '' }}
+        env:
+          VAPOR_API_TOKEN: ${{ secrets.VAPOR_API_TOKEN }}
+          VAPOR_TEAM: ${{ secrets.VAPOR_TEAM }}
+        run: |
+          composer global require laravel/vapor-cli
+          vapor login --api-token="$VAPOR_API_TOKEN" --team="$VAPOR_TEAM"
+          vapor deploy production --commit="$GITHUB_SHA"
