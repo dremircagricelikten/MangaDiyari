@@ -43,4 +43,10 @@
             @endif
         </div>
     </div>
+
+    @include('partials.comments', [
+        'comments' => $chapter->comments,
+        'storeRoute' => route('chapter-comments.store', [$manga, $chapter->number]),
+        'formId' => 'chapter-comment-body',
+    ])
 @endsection

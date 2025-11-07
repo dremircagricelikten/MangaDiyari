@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Manga;
 use App\Support\Cache\MangaCache;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 
 class MangaController extends Controller
 {
@@ -19,6 +20,7 @@ class MangaController extends Controller
 
         return view('mangas.show', [
             'manga' => $manga,
+            'isSubscribed' => $isSubscribed,
         ]);
     }
 }

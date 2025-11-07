@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Chapter;
 use App\Models\Manga;
+use App\Notifications\NewChapterNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -59,7 +61,15 @@ class ChapterController extends Controller
             }
         }
 
-        Chapter::create($validated);
+        $chapter = Chapter::create($validated);
+
+        $chapter->load('manga.subscribers');
+
+        $subscribers = $chapter->manga->subscribers;
+
+        if ($subscribers->isNotEmpty()) {
+            Notification::send($subscribers, new NewChapterNotification($chapter));
+        }
 
         return redirect()->route('admin.chapters.index')
             ->with('status', 'Bölüm başarıyla oluşturuldu.');
