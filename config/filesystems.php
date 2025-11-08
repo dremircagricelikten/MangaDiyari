@@ -20,6 +20,19 @@ return [
             'throw' => false,
         ],
 
+        'ftp' => [
+            'driver' => 'ftp',
+            'host' => env('FTP_HOST'),
+            'username' => env('FTP_USERNAME'),
+            'password' => env('FTP_PASSWORD'),
+            'port' => env('FTP_PORT', 21),
+            'root' => env('FTP_ROOT', ''),
+            'passive' => env('FTP_PASSIVE', true),
+            'ssl' => env('FTP_SSL', false),
+            'timeout' => env('FTP_TIMEOUT', 30),
+            'throw' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
