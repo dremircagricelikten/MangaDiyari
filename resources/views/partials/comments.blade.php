@@ -49,6 +49,40 @@
                     @endcan
                 </div>
                 <p class="mb-0 mt-2">{{ $comment->body }}</p>
+                @php
+                    $reactionSummary = $comment->reactionSummary();
+                    $userReaction = $comment->relationLoaded('reactions')
+                        ? optional($comment->reactions->first())->type?->value
+                        : null;
+                @endphp
+                <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
+                    @foreach (\App\Enums\ReactionType::cases() as $reactionType)
+                        @php
+                            $isActive = $userReaction === $reactionType->value;
+                            $count = $reactionSummary[$reactionType->value] ?? 0;
+                        @endphp
+                        @auth
+                            <form action="{{ route('comments.reactions.store', $comment) }}" method="POST" class="me-1">
+                                @csrf
+                                <input type="hidden" name="type" value="{{ $reactionType->value }}">
+                                <button type="submit"
+                                    class="btn btn-sm {{ $isActive ? 'btn-primary' : 'btn-outline-secondary' }} d-flex align-items-center gap-2">
+                                    <i class="bi bi-{{ $reactionType->icon() }}"></i>
+                                    <span>{{ $reactionType->label() }}</span>
+                                    <span class="badge {{ $isActive ? 'text-bg-light text-dark' : 'text-bg-secondary' }}">
+                                        {{ $count }}
+                                    </span>
+                                </button>
+                            </form>
+                        @else
+                            <span class="badge text-bg-light text-dark border d-flex align-items-center gap-2">
+                                <i class="bi bi-{{ $reactionType->icon() }} text-secondary"></i>
+                                <span>{{ $reactionType->label() }}</span>
+                                <span class="badge text-bg-secondary">{{ $count }}</span>
+                            </span>
+                        @endauth
+                    @endforeach
+                </div>
             </div>
         @empty
             <div class="list-group-item text-muted">Henüz yorum yapılmamış. İlk yorumu siz yapın!</div>

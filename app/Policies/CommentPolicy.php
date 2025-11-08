@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\UserRole;
 use App\Models\Comment;
 use App\Models\User;
 
@@ -12,6 +13,11 @@ class CommentPolicy
      */
     public function delete(User $user, Comment $comment): bool
     {
-        return $user->is_admin || $user->id === $comment->user_id;
+        return $user->hasAnyRole(UserRole::ADMIN, UserRole::MODERATOR) || $user->id === $comment->user_id;
+    }
+
+    public function react(User $user, Comment $comment): bool
+    {
+        return $user->exists;
     }
 }
