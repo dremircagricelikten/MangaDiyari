@@ -12,12 +12,16 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MangaSubscriptionController;
+use App\Http\Controllers\ReactionController;
+use App\Http\Controllers\ReadingListController;
+use App\Http\Controllers\ThemeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('/mangas/{manga}', [FrontMangaController::class, 'show'])->name('mangas.show');
 Route::get('/mangas/{manga}/chapters/{number}', [FrontChapterController::class, 'show'])->name('chapters.show');
 Route::get('/search', SearchController::class)->name('search');
+Route::post('/theme', ThemeController::class)->name('theme.toggle');
 
 Route::middleware('guest')->group(function () {
     Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
@@ -47,11 +51,12 @@ Route::middleware('auth')
         Route::post('/mangas/{manga}/comments', [CommentController::class, 'storeForManga'])->name('manga-comments.store');
         Route::post('/mangas/{manga}/chapters/{number}/comments', [CommentController::class, 'storeForChapter'])->name('chapter-comments.store');
         Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+        Route::post('/comments/{comment}/reactions', [ReactionController::class, 'store'])->name('comments.reactions.store');
         Route::post('/mangas/{manga}/subscribe', [MangaSubscriptionController::class, 'store'])->name('mangas.subscribe');
         Route::delete('/mangas/{manga}/subscribe', [MangaSubscriptionController::class, 'destroy'])->name('mangas.unsubscribe');
     });
 
-Route::middleware('auth')
+Route::middleware(['auth', 'role:admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {

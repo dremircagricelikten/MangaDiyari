@@ -8,6 +8,7 @@ class MangaCache
 {
     public const HOME_POPULAR_KEY = 'home:popular_mangas';
     public const HOME_LATEST_KEY = 'home:latest_mangas';
+    public const HOME_FEATURED_KEY = 'home:featured_slider';
     public const SEARCH_STATUSES_KEY = 'search:available_statuses';
     public const SEARCH_GENRES_KEY = 'search:available_genres';
 
@@ -25,6 +26,15 @@ class MangaCache
         return Cache::remember(
             self::HOME_LATEST_KEY,
             now()->addSeconds(config('manga.cache.home_ttl', 600)),
+            $callback
+        );
+    }
+
+    public static function rememberHomeFeatured(callable $callback)
+    {
+        return Cache::remember(
+            self::HOME_FEATURED_KEY,
+            now()->addSeconds(config('manga.cache.home_featured_ttl', 900)),
             $callback
         );
     }
@@ -65,6 +75,7 @@ class MangaCache
     {
         Cache::forget(self::HOME_POPULAR_KEY);
         Cache::forget(self::HOME_LATEST_KEY);
+        Cache::forget(self::HOME_FEATURED_KEY);
     }
 
     public static function forgetSearchFilters(): void

@@ -1,18 +1,62 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="py-5 text-center">
-    <h1 class="display-4 fw-bold mb-3">{{ config('app.name', 'MangaDiyari') }}'ye Hoş Geldin</h1>
-    <p class="lead text-muted">En sevdiğin mangaları keşfet, oku ve toplulukla paylaş.</p>
-    <div class="d-flex flex-column flex-sm-row justify-content-center gap-2 mt-4">
-        <a href="{{ route('search') }}" class="btn btn-dark btn-lg">Manga Keşfet</a>
-        @guest
-            <a href="{{ route('register') }}" class="btn btn-outline-dark btn-lg">Hemen Katıl</a>
-        @else
-            <a href="{{ route('dashboard') }}" class="btn btn-outline-dark btn-lg">Panelime Git</a>
-        @endguest
+<section class="py-5">
+    <div class="row g-4 align-items-center">
+        <div class="col-lg-7">
+            @if ($featuredMangas->isNotEmpty())
+                <div id="heroSlider" class="carousel slide hero-slider shadow" data-bs-ride="carousel">
+                    <div class="carousel-indicators">
+                        @foreach ($featuredMangas as $index => $manga)
+                            <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="{{ $index }}"
+                                class="{{ $loop->first ? 'active' : '' }}" aria-current="{{ $loop->first ? 'true' : 'false' }}"
+                                aria-label="{{ $manga->title }}"></button>
+                        @endforeach
+                    </div>
+                    <div class="carousel-inner">
+                        @foreach ($featuredMangas as $manga)
+                            @php($coverUrl = \App\Support\MediaUrlGenerator::fromPath($manga->cover_image_path))
+                            <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+                                @if ($coverUrl)
+                                    <img src="{{ $coverUrl }}" class="d-block w-100 rounded-4" alt="{{ $manga->title }}">
+                                @endif
+                                <div class="carousel-caption text-start d-none d-md-block">
+                                    <span class="badge text-bg-dark">{{ $manga->chapters_count }} bölüm</span>
+                                    <h2 class="h3 fw-bold mt-2">
+                                        <a href="{{ route('mangas.show', $manga) }}" class="link-light text-decoration-none">
+                                            {{ $manga->title }}
+                                        </a>
+                                    </h2>
+                                    <p class="small text-white-50 mb-0">{{ \Illuminate\Support\Str::limit($manga->summary, 120) }}</p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#heroSlider" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Önceki</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#heroSlider" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Sonraki</span>
+                    </button>
+                </div>
+            @endif
+        </div>
+        <div class="col-lg-5 text-center text-lg-start">
+            <h1 class="display-5 fw-bold mb-3">{{ config('app.name', 'MangaDiyari') }}'ye Hoş Geldin</h1>
+            <p class="lead text-muted">En sevdiğin mangaları keşfet, oku ve toplulukla paylaş.</p>
+            <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-lg-start gap-2 mt-4">
+                <a href="{{ route('search') }}" class="btn btn-dark btn-lg">Manga Keşfet</a>
+                @guest
+                    <a href="{{ route('register') }}" class="btn btn-outline-dark btn-lg">Hemen Katıl</a>
+                @else
+                    <a href="{{ route('dashboard') }}" class="btn btn-outline-dark btn-lg">Panelime Git</a>
+                @endguest
+            </div>
+        </div>
     </div>
-</div>
+</section>
 
 <section class="py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
